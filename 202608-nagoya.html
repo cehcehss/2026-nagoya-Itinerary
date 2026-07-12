@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026-08 名古屋之旅</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
+            background: #f0f4f8;
+            color: #2d3748;
+            line-height: 1.6;
+            padding-top: 44px;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.55)),
+                        url('https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=800&q=80') center/cover no-repeat;
+            color: white;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            position: relative;
+            z-index: 50;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 0.3rem;
+        }
+
+        .travelers {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .traveler {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(4px);
+            padding: 0.25rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .nav-days {
+            display: flex;
+            overflow-x: auto;
+            background: #1a1a2e;
+            padding: 0.6rem 0.8rem;
+            gap: 0.4rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 99;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-days::before,
+        .nav-days::after {
+            content: '';
+            margin: auto;
+        }
+
+        .nav-days a {
+            flex-shrink: 0;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.08);
+            color: #a0aec0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.1);
+            letter-spacing: 0.3px;
+        }
+
+        .nav-days a:active {
+            background: rgba(229, 62, 62, 0.8);
+            color: white;
+            border-color: rgba(229, 62, 62, 0.6);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .day-section {
+            margin-top: 1.5rem;
+        }
+
+        .day-header {
+            background: linear-gradient(135deg, #2d3748, #4a5568);
+            color: white;
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .day-header .day-icon {
+            font-size: 1.8rem;
+        }
+
+        .day-header .day-info h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .day-header .day-info .day-subtitle {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e2e8f0;
+            border-radius: 1px;
+        }
+
+        .timeline-item {
+            position: relative;
+            background: white;
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+
+        .timeline-item:active {
+            transform: scale(0.98);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -1.5rem;
+            top: 1.2rem;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #e53e3e;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #e53e3e;
+            z-index: 1;
+        }
+
+        .timeline-item.transport::before {
+            background: #3182ce;
+            box-shadow: 0 0 0 2px #3182ce;
+        }
+
+        .timeline-item.food::before {
+            background: #dd6b20;
+            box-shadow: 0 0 0 2px #dd6b20;
+        }
+
+        .timeline-item.hotel::before {
+            background: #805ad5;
+            box-shadow: 0 0 0 2px #805ad5;
+        }
+
+        .timeline-item.attraction::before {
+            background: #38a169;
+            box-shadow: 0 0 0 2px #38a169;
+        }
+
+        .timeline-item .item-category {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-item.transport .item-category { color: #3182ce; }
+        .timeline-item.food .item-category { color: #dd6b20; }
+        .timeline-item.hotel .item-category { color: #805ad5; }
+        .timeline-item.attraction .item-category { color: #38a169; }
+
+        .timeline-item .item-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-item .item-title a {
+            color: inherit;
+            text-decoration: none;
+            border-bottom: 1px dashed #cbd5e0;
+        }
+
+        .timeline-item .item-detail {
+            font-size: 0.85rem;
+            color: #4a5568;
+            margin-top: 0.2rem;
+        }
+
+        .timeline-item .item-note {
+            font-size: 0.8rem;
+            color: #718096;
+            background: #f7fafc;
+            border-left: 3px solid #e2e8f0;
+            padding: 0.5rem 0.8rem;
+            margin-top: 0.5rem;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .timeline-item .item-note a {
+            color: #3182ce;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .timeline-item .item-time {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: white;
+            background: #4a5568;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            margin-bottom: 0.4rem;
+        }
+
+        .map-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.75rem;
+            color: #3182ce;
+            text-decoration: none;
+            margin-top: 0.4rem;
+            padding: 0.2rem 0.5rem;
+            background: #ebf8ff;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .map-link:active {
+            background: #bee3f8;
+        }
+
+        .flight-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: #4a5568;
+        }
+
+        .flight-info .arrow {
+            color: #e53e3e;
+            font-weight: bold;
+        }
+
+        .todo-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            background: #fefcbf;
+            color: #975a16;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 500;
+            margin-left: 0.3rem;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: rgba(26, 26, 46, 0.85);
+            backdrop-filter: blur(8px);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.15);
+            font-size: 1.3rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            transition: all 0.2s;
+        }
+
+        .back-to-top:active {
+            transform: scale(0.9);
+            background: rgba(229, 62, 62, 0.85);
+        }
+
+        @media (min-width: 768px) {
+            .header h1 { font-size: 1.8rem; }
+            .container { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>🇯🇵 2026-08 名古屋之旅</h1>
+    <div class="subtitle">8/15 (六) ~ 8/19 (三) ・ 5天4夜</div>
+    <div class="travelers">
+        <span class="traveler">Vicky</span>
+        <span class="traveler">Mandy</span>
+        <span class="traveler">Elsie</span>
+    </div>
+</div>
+
+<nav class="nav-days">
+    <a href="#day1">Day1 8/15</a>
+    <a href="#day2">Day2 8/16</a>
+    <a href="#day3">Day3 8/17</a>
+    <a href="#day4">Day4 8/18</a>
+    <a href="#day5">Day5 8/19</a>
+</nav>
+
+<div class="container">
+
+    <!-- Day 1 -->
+    <section class="day-section" id="day1">
+        <div class="day-header">
+            <div class="day-icon">✈️</div>
+            <div class="day-info">
+                <h2>Day 1 — 8月15日（六）</h2>
+                <div class="day-subtitle">出發日・榮站周邊</div>
+            </div>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-item transport">
+                <div class="item-category">交通</div>
+                <div class="item-time">09:30</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E6%A1%83%E5%9C%92%E6%A9%9F%E5%A0%B4%E7%AC%AC%E4%B8%80%E8%88%AA%E5%BB%88/data=!4m2!3m1!19sChIJ3YKle7-fQjQR-5FvN19n14Y" target="_blank">桃園機場第一航廈</a>
+                </div>
+                <div class="item-detail">航班：CX530 ／ 出發：11:30（台北時間）</div>
+                <div class="item-note">9:30 抵達機場第一航廈</div>
+            </div>
+
+            <div class="timeline-item transport">
+                <div class="item-category">交通</div>
+                <div class="item-time">15:30</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E4%B8%AD%E9%83%A8%E5%9C%8B%E9%9A%9B%E6%A9%9F%E5%A0%B4(%E6%96%B0%E7%89%B9%E9%BA%97%E4%BA%9E)+(NGO)/data=!4m2!3m1!19sChIJzynM7ZN9BGARJQAsbih9mEI" target="_blank">中部國際機場（新特麗亞）NGO 第一航廈</a>
+                </div>
+                <div class="item-detail">抵達：15:30（日本時間）</div>
+            </div>
+
+            <div class="timeline-item hotel">
+                <div class="item-category">住宿</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/VESSEL+INN+SAKAE+STATION/data=!4m2!3m1!19sChIJw4LCq9VwA2AR15wGfl6Bbho" target="_blank">VESSEL INN SAKAE STATION</a>
+                </div>
+                <div class="item-detail">飯店入住</div>
+                <div class="item-note"><a href="https://www.bigfang.tw/blog/post/vessel-inn-sakae-ekimae" target="_blank">8號出口電梯</a> 路線介紹</div>
+            </div>
+
+            <div class="timeline-item food">
+                <div class="item-category">晚餐</div>
+                <div class="item-time">18:30</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E3%82%AB%E3%83%84%E3%83%AC%E3%83%84MATUMURA+bis+CHUNICHI+BUILDNG+(%E3%83%9E%E3%83%84%E3%83%A0%E3%83%A9)+%E4%B8%AD%E6%97%A5%E3%83%93%E3%83%AB/data=!4m2!3m1!19sChIJW5I2IQBxA2ARIEmr5H7Y_AE" target="_blank">カツレツMATUMURA bis（マツムラ）中日ビル</a>
+                </div>
+                <div class="item-detail">炸豬排名店</div>
+                <div class="item-note">18:30 已訂位 2+1 位</div>
+            </div>
+
+            <div class="timeline-item attraction">
+                <div class="item-category">景點</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E7%B6%A0%E6%B4%B221/data=!4m2!3m1!19sChIJT5niKdRwA2AR1oO7t2LlvlQ" target="_blank">綠洲21</a>
+                </div>
+                <div class="item-detail">夜景、燈光秀、購物中心</div>
+                <div class="item-note">點燈：日落~23:00</div>
+            </div>
+
+            <div class="timeline-item attraction">
+                <div class="item-category">景點</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E4%B8%AD%E9%83%A8%E9%9B%BB%E5%8A%9B+MIRAI+TOWER/data=!4m2!3m1!19sChIJRQSoYtZwA2ARwpz475VYYeo" target="_blank">中部電力 MIRAI TOWER</a>
+                </div>
+                <div class="item-detail">名古屋必拍地標</div>
+                <div class="item-note">點燈：日落~24:00</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Day 2 -->
+    <section class="day-section" id="day2">
+        <div class="day-header">
+            <div class="day-icon">⛩️</div>
+            <div class="day-info">
+                <h2>Day 2 — 8月16日（日）</h2>
+                <div class="day-subtitle">熱田神宮・大須商店街</div>
+            </div>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-item food">
+                <div class="item-category">早餐</div>
+                <div class="item-title">
+                    <a href="https://maps.app.goo.gl/Mx47jQCoZcDEuaVv7" target="_blank">加藤珈琲店 栄店</a>
+                </div>
+                <div class="item-note">兩週前開放訂位 → <a href="https://airrsv.net/katocoffee/calendar" target="_blank">預約表單</a></div>
+            </div>
+
+            <div class="timeline-item attraction">
+                <div class="item-category">景點</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E7%86%B1%E7%94%B0%E7%A5%9E%E5%AE%AE/data=!4m2!3m1!19sChIJ3abhnnt6A2ARu-Y4yDEWlao" target="_blank">熱田神宮</a>
+                </div>
+            </div>
+
+            <div class="timeline-item food">
+                <div class="item-category">午餐</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E5%AE%AE%E3%81%8D%E3%81%97%E3%82%81%E3%82%93+%E7%A5%9E%E5%AE%AE%E5%BA%97/data=!4m2!3m1!19sChIJ-c22cxl6A2ARx4gE5g3fNxI" target="_blank">宮きしめん 神宮店</a>
+                </div>
+                <div class="item-detail">名古屋名物棊子麵</div>
+            </div>
+
+            <div class="timeline-item attraction">
+                <div class="item-category">景點</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E5%A4%A7%E9%A0%88%E5%95%86%E5%BA%97%E8%A1%97/data=!4m2!3m1!19sChIJZdlrqMxwA2ARpJpFJF45vgg" target="_blank">大須商店街</a>
+                </div>
+            </div>
+
+            <div class="timeline-item attraction">
+                <div class="item-category">景點</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E5%A4%A7%E9%A0%88%E8%A7%80%E9%9F%B3/data=!4m2!3m1!19sChIJr3HDSzJ3A2AR6Pctdr3J-yc" target="_blank">大須觀音</a>
+                </div>
+            </div>
+
+            <div class="timeline-item food">
+                <div class="item-category">下午茶</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E3%82%B3%E3%83%B3%E3%83%91%E3%83%AB+%E5%A4%A7%E9%A0%88%E6%9C%AC%E5%BA%97/data=!4m2!3m1!19sChIJh2A8fctwA2ARLFVqblDns64" target="_blank">コンパル 大須本店</a>
+                </div>
+                <div class="item-detail">喫茶店</div>
+                <div class="item-note"><a href="https://bobbytravel.tw/konparu/" target="_blank">炸蝦三明治介紹</a></div>
+            </div>
+
+            <div class="timeline-item food">
+                <div class="item-category">晚餐</div>
+                <div class="item-time">17:30</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E5%A4%A7%E9%A0%88%E9%AE%A8/data=!4m2!3m1!19sChIJQwh-9zJ3A2ARuSaFxkQyVXk" target="_blank">大須鮨</a>
+                </div>
+                <div class="item-note">17:30 營業</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Day 3 -->
+    <section class="day-section" id="day3">
+        <div class="day-header">
+            <div class="day-icon">🏰</div>
+            <div class="day-info">
+                <h2>Day 3 — 8月17日（一）</h2>
+                <div class="day-subtitle">吉卜力公園・鰻魚飯</div>
+            </div>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-item food">
+                <div class="item-category">早餐</div>
+                <div class="item-title">飯店早餐</div>
+                <div class="item-note"><span class="todo-tag">TODO</span> 加購飯店早餐</div>
+            </div>
+
+            <div class="timeline-item attraction">
+                <div class="item-category">景點</div>
+                <div class="item-time">11:00</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E5%90%89%E5%8D%9C%E5%8A%9B%E5%85%AC%E5%9C%92/data=!4m2!3m1!19sChIJs9ADAkVnA2ARixLFaXpLFjY" target="_blank">吉卜力公園 大倉庫</a>
+                </div>
+                <div class="item-detail">11:00 場次（11:00~12:00 報到）</div>
+                <div class="item-note"><a href="https://maps.app.goo.gl/fV8ps7jEQz4QN3rR9" target="_blank">交通路線</a>・車程約1小時</div>
+            </div>
+
+            <div class="timeline-item food">
+                <div class="item-category">晚餐</div>
+                <div class="item-time">18:30</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E7%86%B1%E7%94%B0%E8%93%AC%E8%90%8A%E8%BB%92%EF%BC%88%E6%9D%BE%E9%98%AA%E5%B1%8B%E5%BA%97%EF%BC%89/data=!4m2!3m1!19sChIJp7G4Ac5wA2ARLrlWk69Xz80" target="_blank">熱田蓬萊軒（松阪屋店）</a>
+                </div>
+                <div class="item-detail">鰻魚飯名店</div>
+                <div class="item-note">營業時間：16:30~20:30 現場抽候位單<br>榮站 → 名城線(1站) → 矢場町駅</div>
+            </div>
+
+            <div class="timeline-item attraction">
+                <div class="item-category">購物</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E6%9D%BE%E5%9D%82%E5%B1%8B+%E5%90%8D%E5%8F%A4%E5%B1%8B%E5%BA%97/data=!4m2!3m1!19sChIJW1efAc5wA2ARSGMn7SZkzZ8" target="_blank">松坂屋 名古屋店</a>
+                </div>
+                <div class="item-detail">百貨公司逛街</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Day 4 -->
+    <section class="day-section" id="day4">
+        <div class="day-header">
+            <div class="day-icon">🏯</div>
+            <div class="day-info">
+                <h2>Day 4 — 8月18日（二）</h2>
+                <div class="day-subtitle">犬山城一日遊</div>
+            </div>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-item attraction">
+                <div class="item-category">景點</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E7%8A%AC%E5%B1%B1%E5%9F%8E/data=!4m2!3m1!19sChIJke1IrfUOA2ARNfYDRkP6Wig" target="_blank">犬山城</a>
+                </div>
+                <div class="item-detail">名古屋站 → 犬山遊園站 → 犬山城 → 神社 → 城下町 → 犬山站 → 名古屋站<br><small>（此路線平緩，回程是下坡路）</small></div>
+                <div class="item-note"><span class="todo-tag">TODO</span> 名古屋站買犬山城套票<br><a href="https://chubu.letsgojp.com/archives/47202/" target="_blank">名古屋到犬山城交通及套票介紹</a></div>
+            </div>
+
+            <div class="timeline-item attraction">
+                <div class="item-category">景點</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E9%87%9D%E7%B6%B1%E7%A5%9E%E7%A4%BE/data=!4m2!3m1!19sChIJ5bm3EPUOA2AR5fgHDZy6mgQ" target="_blank">針綱神社</a>
+                </div>
+            </div>
+
+            <div class="timeline-item attraction">
+                <div class="item-category">景點</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E4%B8%89%E5%85%89%E7%A8%BB%E8%8D%B7%E7%A5%9E%E7%A4%BE/data=!4m2!3m1!19sChIJxXSC4fQOA2AR7Flr0b9587c" target="_blank">三光稻荷神社</a>
+                </div>
+            </div>
+
+            <div class="timeline-item food">
+                <div class="item-category">午餐</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E7%8A%AC%E5%B1%B1%E5%9F%8E%E4%B8%8B%E7%94%BA/data=!4m2!3m1!19sChIJ5Y9fqhEPA2AR2D46BA_SRiY" target="_blank">犬山城下町</a>
+                </div>
+                <div class="item-detail">下町商店街的餐廳吃午餐</div>
+            </div>
+
+            <div class="timeline-item transport">
+                <div class="item-category">交通</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E7%8A%AC%E5%B1%B1%E9%A7%85/data=!4m2!3m1!19sChIJISEMRGMOA2ARoT5bo8KMfTE" target="_blank">犬山駅</a>
+                </div>
+                <div class="item-detail">搭車返回名古屋車站</div>
+            </div>
+
+            <div class="timeline-item food">
+                <div class="item-category">晚餐 / 宵夜</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E3%81%B5%E3%81%BF%E5%B1%8B+%E9%8C%A6%E5%BA%97/data=!4m2!3m1!19sChIJpf3ElIFxA2ARURv3r4mJTiI" target="_blank">ふみ屋 錦店</a>
+                </div>
+                <div class="item-detail">居酒屋・雞翅評價很好</div>
+                <div class="item-note">飯店走路 1 min ・需付現金<br>平日 11:30~翌 3:00，沒午休</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Day 5 -->
+    <section class="day-section" id="day5">
+        <div class="day-header">
+            <div class="day-icon">🛫</div>
+            <div class="day-info">
+                <h2>Day 5 — 8月19日（三）</h2>
+                <div class="day-subtitle">回程日・HARBS 蛋糕</div>
+            </div>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-item hotel">
+                <div class="item-category">住宿</div>
+                <div class="item-title">飯店退房</div>
+            </div>
+
+            <div class="timeline-item food">
+                <div class="item-category">甜點</div>
+                <div class="item-time">11:00</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/HARBS+%E6%A6%AE%E6%9C%AC%E5%BA%97/data=!4m2!3m1!19sChIJX3yZKtRwA2AR6yJ4eXUgQOk" target="_blank">HARBS 榮本店</a>
+                </div>
+                <div class="item-note">11:00 營業・距飯店 160m</div>
+            </div>
+
+            <div class="timeline-item attraction">
+                <div class="item-category">購物</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E8%9D%A6%E4%BB%99%E8%B2%9D%E4%B9%8B%E9%87%8C+%E4%B8%AD%E9%83%A8%E5%9C%8B%E9%9A%9B%E6%A9%9F%E5%A0%B4%E5%BA%97/data=!4m2!3m1!19sChIJ2QpdOOx9BGARGmsU42rRzg4" target="_blank">蝦仙貝之里 中部國際機場店</a>
+                </div>
+                <div class="item-note">可以買完再去托行李</div>
+            </div>
+
+            <div class="timeline-item transport">
+                <div class="item-category">交通</div>
+                <div class="item-time">16:40</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E4%B8%AD%E9%83%A8%E5%9C%8B%E9%9A%9B%E6%A9%9F%E5%A0%B4(%E6%96%B0%E7%89%B9%E9%BA%97%E4%BA%9E)+(NGO)/data=!4m2!3m1!19sChIJzynM7ZN9BGARJQAsbih9mEI" target="_blank">中部國際機場（新特麗亞）NGO 第一航廈</a>
+                </div>
+                <div class="item-detail">航班：CX531 ／ 出發：16:40（日本時間）</div>
+            </div>
+
+            <div class="timeline-item transport">
+                <div class="item-category">交通</div>
+                <div class="item-time">18:50</div>
+                <div class="item-title">
+                    <a href="https://www.google.com/maps/place/%E6%A1%83%E5%9C%92%E6%A9%9F%E5%A0%B4%E7%AC%AC%E4%B8%80%E8%88%AA%E5%BB%88/data=!4m2!3m1!19sChIJ3YKle7-fQjQR-5FvN19n14Y" target="_blank">桃園機場第一航廈</a>
+                </div>
+                <div class="item-detail">抵達：18:50（台北時間）</div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到頂部">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+</body>
+</html>
